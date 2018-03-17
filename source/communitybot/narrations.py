@@ -63,12 +63,12 @@ class Narrator:
             self.post_to_webhooks(narration, action)
 
             if action['type'] == 'post':
-                postid = steemi_post(action['value'])
-                narration.set_postid(postid)
+                post_id = steemi_post(action['value'])
+                narration.set_postid(post_id)
 
             if action['type'] == 'comment':
-                postid = steemi_comment(narration.get_postid(), action['value'])
-                narration.add_comment(postid)
+                post_id = steemi_comment(narration.get_postid(), action['value'])
+                narration.add_comment(post_id)
 
             if action['type'] == 'upvote':
                 steemi_vote_up(action['value'])

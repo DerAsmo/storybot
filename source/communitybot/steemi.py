@@ -1,7 +1,5 @@
 import datetime
 
-from timeit import default_timer as timer
-
 from communitybot.settings import STEEM_NODES, STEEM_BOT_POSTING_KEY, STEEM_BOT_ACCOUNT, STEEM_API_MODE
 from communitybot.utils import get_example_votes, build_postid
 
@@ -30,11 +28,11 @@ def can_post():
     return False
 
 
-def update_last_post(postid):
+def update_last_post(post_id):
     global _last_post_id
     global _last_post_created
 
-    identifier = construct_identifier(postid['username'], postid['permlink'])
+    identifier = construct_identifier(post_id['username'], post_id['permlink'])
 
     if identifier is not _last_post_id:
         steemd_instance = get_steem_conn()
@@ -85,79 +83,80 @@ def steemi_post_steempython(post, parentid=None):
     steemd_instance = get_steem_conn()
     steemd_instance.commit.post(post['title'], post['body'], STEEM_BOT_ACCOUNT, permlink=permlink, reply_identifier=reply_identifier, tags="testing")
 
-    postid = build_postid(STEEM_BOT_ACCOUNT, permlink)
+    post_id = build_postid(STEEM_BOT_ACCOUNT, permlink)
 
-    return postid
+    return post_id
 
 
-def steemi_post_debug(post, parentid=None):
+def steemi_post_debug(post, parent_id=None):
     print('steemi post:\n%s' % '\n'.join(post))
 
     username = 'derasmo'
-    if parentid is None:
+    if parent_id is None:
         permlink = 'a-story-to-test'
     else:
-        permlink = 're--a-story-to-test'
-        print('steemi post: parent identifier is set\n%s' % '\n'.join(parentid))
+        permlink = 're-derasmoa-story-to-test-20180317t172512'
+        print('steemi post: parent identifier is set\n%s' % '\n'.join(parent_id))
 
-    postid = build_postid(username, permlink)
+    post_id = build_postid(username, permlink)
 
-    return postid
+    return post_id
 
 
-# post: {'title': <string>, 'body': <body>, 'permlink': <string>}
-def steemi_post(post, apimode=STEEM_API_MODE):
-    postid = None
-    if apimode == 'debug':
-        postid = steemi_post_debug(post)
+def steemi_post(post, api_mode=STEEM_API_MODE):
+    post_id = None
+    if api_mode == 'debug':
+        post_id = steemi_post_debug(post)
     elif can_post():
-        if apimode == 'steempython':
-            postid = steemi_post_steempython(post)
+        if api_mode == 'steempython':
+            post_id = steemi_post_steempython(post)
 
-        update_last_post(postid)
+        update_last_post(post_id)
 
-    return postid
+    return post_id
 
 
-def steemi_comment(parentid, post, apimode=STEEM_API_MODE):
+def steemi_comment(parent_id, post, api_mode=STEEM_API_MODE):
     permlink = None
-    if apimode == 'debug':
-        permlink = steemi_post_debug(post, parentid)
+    if api_mode == 'debug':
+        permlink = steemi_post_debug(post, parent_id)
 
-    if apimode == 'steempython':
-        permlink = steemi_post_steempython(post, parentid)
+    if api_mode == 'steempython':
+        permlink = steemi_post_steempython(post, parent_id)
 
     return permlink
 
 
-# postid: {'username': <string>, 'permlink': <string>}
-def steemi_get_votes_steempython(postid):
+def steemi_get_votes_steempython(post_id):
     steemd_instance = get_steem_conn()
-    votes = steemd_instance.get_active_votes(postid['username'], postid['permlink'])
+    votes = steemd_instance.get_active_votes(post_id['username'], post_id['permlink'])
 
     return votes
 
 
-def steemi_get_votes_debug(postid):
+def steemi_get_votes_debug(post_id):
+    identifier = construct_identifier(post_id['username'], post_id['permlink'])
+    print('steemi get votes: %s' % identifier)
+
     votes = get_example_votes()
 
     return votes
 
 
-def steemi_get_votes(postid, apimode=STEEM_API_MODE):
+def steemi_get_votes(post_id, api_mode=STEEM_API_MODE):
     votes = []
 
-    if apimode == 'debug':
-        votes = steemi_get_votes_debug(postid)
+    if api_mode == 'debug':
+        votes = steemi_get_votes_debug(post_id)
 
-    if apimode == 'steempython':
-        votes = steemi_get_votes_steempython(postid)
+    if api_mode == 'steempython':
+        votes = steemi_get_votes_steempython(post_id)
 
     return votes
 
 
-def steemi_vote_up_steempython(postid):
-    identifier = construct_identifier(postid['username'], postid['permlink'])
+def steemi_vote_up_steempython(post_id):
+    identifier = construct_identifier(post_id['username'], post_id['permlink'])
     steemd_instance = get_steem_conn()
 
     steem_post = Post(identifier, steemd_instance=steemd_instance)
@@ -172,14 +171,14 @@ def steemi_vote_up_steempython(postid):
         steem_post.vote(100, STEEM_BOT_ACCOUNT)
 
 
-def steemi_vote_up_debug(postid):
-    identifier = construct_identifier(postid['username'], postid['permlink'])
+def steemi_vote_up_debug(post_id):
+    identifier = construct_identifier(post_id['username'], post_id['permlink'])
     print('steemi vote up: %s' % identifier)
 
 
-def steemi_vote_up(postid, apimode=STEEM_API_MODE):
-    if apimode == 'debug':
-        steemi_vote_up_debug(postid)
+def steemi_vote_up(post_id, api_mode=STEEM_API_MODE):
+    if api_mode == 'debug':
+        steemi_vote_up_debug(post_id)
 
-    if apimode == 'steempython':
-        steemi_vote_up_steempython(postid)
+    if api_mode == 'steempython':
+        steemi_vote_up_steempython(post_id)

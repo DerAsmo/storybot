@@ -54,8 +54,8 @@ class Teststory:
         self.votes.append(votes)
 
     # helper function to guarantee all actions are the same
-    def add_action(self, type, value=None):
-        self.actions.append({'type': type, 'value': value})
+    def add_action(self, action_type, action_value=None):
+        self.actions.append({'type': action_type, 'value': action_value})
 
     def get_actions(self):
         output = self.actions.copy()
