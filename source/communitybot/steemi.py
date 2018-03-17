@@ -1,3 +1,5 @@
+import datetime
+
 from timeit import default_timer as timer
 
 from communitybot.settings import STEEM_NODES, STEEM_BOT_POSTING_KEY, STEEM_BOT_ACCOUNT, STEEM_API_MODE
@@ -11,21 +13,35 @@ from steem.utils import derive_permlink, construct_identifier
 _steem_account = None
 _steem_conn = None
 
-_last_post = None
+_last_post_id = None
+_last_post_created = None
 
 
 def can_post():
-    # TODO: come up with something more reliable
-    global _last_post
-    if (_last_post is None) or (21 < (timer() - _last_post)):
+    global _last_post_created
+
+    if _last_post_created is None:
         return True
+    else:
+        now = datetime.datetime.utcnow()
+        if 20 < (now - _last_post_created).total_seconds():
+            return True
 
     return False
 
 
-def update_last_post():
-    global _last_post
-    _last_post = timer()
+def update_last_post(postid):
+    global _last_post_id
+    global _last_post_created
+
+    identifier = construct_identifier(postid['username'], postid['permlink'])
+
+    if identifier is not _last_post_id:
+        steemd_instance = get_steem_conn()
+        steem_post = Post(identifier, steemd_instance=steemd_instance)
+
+        _last_post_id = identifier
+        _last_post_created = steem_post.get('created')
 
 
 def get_steem_acc():
@@ -98,7 +114,7 @@ def steemi_post(post, apimode=STEEM_API_MODE):
         if apimode == 'steempython':
             postid = steemi_post_steempython(post)
 
-        update_last_post()
+        update_last_post(postid)
 
     return postid
 
@@ -147,7 +163,7 @@ def steemi_vote_up_steempython(postid):
     steem_post = Post(identifier, steemd_instance=steemd_instance)
 
     already_voted = False
-    for active_vote in p.get("active_votes", []):
+    for active_vote in steem_post.get("active_votes", []):
         if active_vote.get("voter") == STEEM_BOT_ACCOUNT:
             already_voted = True
             break
