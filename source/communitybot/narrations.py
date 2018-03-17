@@ -2,7 +2,7 @@
 # !use Threaded loop
 import time
 
-from communitybot.settings import DISCORD_HOOKS, STEEM_BOT_ACCOUNT
+from communitybot.settings import DISCORD_HOOKS
 
 from communitybot.steemi import steemi_post, steemi_comment, steemi_vote_up, steemi_get_votes
 from communitybot.embeds import Webhook
