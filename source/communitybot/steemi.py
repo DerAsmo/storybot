@@ -146,7 +146,14 @@ def steemi_vote_up_steempython(postid):
 
     steem_post = Post(identifier, steemd_instance=steemd_instance)
 
-    steem_post.vote(100, STEEM_BOT_ACCOUNT)
+    already_voted = False
+    for active_vote in p.get("active_votes", []):
+        if active_vote.get("voter") == STEEM_BOT_ACCOUNT:
+            already_voted = True
+            break
+
+    if not already_voted:
+        steem_post.vote(100, STEEM_BOT_ACCOUNT)
 
 
 def steemi_vote_up_debug(postid):
