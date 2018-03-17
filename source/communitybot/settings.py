@@ -8,7 +8,7 @@ STEEM_API_MODE = 'steempython'
 # Steem Account Settings
 
 STEEM_BOT_ACCOUNT = "storybot"
-STEEM_BOT_POSTING_KEY = "discord.bot_token"
+STEEM_BOT_POSTING_KEY = "private wif"
 
 # Discord Bot Settings
 
