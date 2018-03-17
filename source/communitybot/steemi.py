@@ -5,6 +5,7 @@ from communitybot.utils import get_example_votes, build_postid
 
 from steem import Steem
 from steem.account import Account
+from steem.post import Post
 from steem.utils import derive_permlink, construct_identifier
 
 _steem_account = None
@@ -139,6 +140,15 @@ def steemi_get_votes(postid, apimode=STEEM_API_MODE):
     return votes
 
 
+def steemi_vote_up_steempython(postid):
+    identifier = construct_identifier(postid['username'], postid['permlink'])
+    steemd_instance = get_steem_conn()
+
+    steem_post = Post(identifier, steemd_instance=steemd_instance)
+
+    steem_post.vote(100, STEEM_BOT_ACCOUNT)
+
+
 def steemi_vote_up_debug(postid):
     identifier = construct_identifier(postid['username'], postid['permlink'])
     print('steemi vote up: %s' % identifier)
@@ -147,3 +157,6 @@ def steemi_vote_up_debug(postid):
 def steemi_vote_up(postid, apimode=STEEM_API_MODE):
     if apimode == 'debug':
         steemi_vote_up_debug(postid)
+
+    if apimode == 'steempython':
+        steemi_vote_up_steempython(postid)
