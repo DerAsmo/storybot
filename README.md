@@ -8,6 +8,7 @@ Therefor it has to read data from the blockchain and post comments etc. accordin
 For storybot to work it needs a working [Python](https://www.python.org/) with [steem-python](https://github.com/steemit/steem-python) packages.
 
 You can download the repository using [Git](https://git-scm.com/):
+
 ``$git clone https://github.com/derasmo/storybot``
 
 Modify settings.py within communitybot directory and add:
@@ -18,6 +19,7 @@ Modify settings.py within communitybot directory and add:
 Start the bot by using:
 
 ``python storybot.py --run narration`` - for no discord integration, starting a predefined story
+
 ``python storybot.py --run discordbot`` - enabling commands and responses through discord
 
 ## how it works
