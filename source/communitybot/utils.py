@@ -1,3 +1,5 @@
+import json
+
 
 def get_help_message(description):
     helpmsg = description
@@ -39,3 +41,23 @@ def build_post(title, body):
 
 def build_postid(username, permlink):
     return {'username': username, 'permlink': permlink}
+
+
+class PostMetadata:
+
+    def __init__(self):
+        self.app = "storybot/0.1.0"
+        self.format = "markdown"
+
+        self.storybot = dict()
+
+    def set_value(self, **kwargs):
+        self.storybot.update(kwargs)
+
+    def get_json(self):
+        output = dict()
+        output['app'] = self.app
+        output['format'] = self.format
+        output['storybot'] = self.storybot
+
+        return json.dumps(output)

@@ -1,7 +1,8 @@
 import datetime
 
-from communitybot.settings import STEEM_NODES, STEEM_BOT_POSTING_KEY, STEEM_BOT_ACCOUNT, STEEM_API_MODE
+from communitybot.settings import STEEM_NODES, STEEM_BOT_POSTING_KEY, STEEM_BOT_ACCOUNT, STEEM_API_MODE, STEEM_POST_TAGS
 from communitybot.utils import get_example_votes, build_postid
+from communitybot.utils import PostMetadata
 
 from steem import Steem
 from steem.account import Account
@@ -80,8 +81,16 @@ def steemi_post_steempython(post, parentid=None):
     else:
         permlink = derive_permlink(post['title'], reply_identifier)
 
+    metadata = PostMetadata()
+
+    post_arguments = dict()
+    post_arguments['pemlink'] = permlink
+    post_arguments['reply_identifier'] = reply_identifier
+    post_arguments['tags'] = STEEM_POST_TAGS
+    post_arguments['reply_identifier'] = metadata.get_json()
+
     steemd_instance = get_steem_conn()
-    steemd_instance.commit.post(post['title'], post['body'], STEEM_BOT_ACCOUNT, permlink=permlink, reply_identifier=reply_identifier, tags="testing")
+    steemd_instance.commit.post(post['title'], post['body'], STEEM_BOT_ACCOUNT, post_arguments)
 
     post_id = build_postid(STEEM_BOT_ACCOUNT, permlink)
 
@@ -99,6 +108,12 @@ def steemi_post_debug(post, parent_id=None):
         print('steemi post: parent identifier is set\n%s' % '\n'.join(parent_id))
 
     post_id = build_postid(username, permlink)
+
+    metadata = PostMetadata()
+    metadata.set_value(id='test id', title='test title')
+    metadata.set_value(chapter='test chapter')
+
+    print("steemi post json_metadata:\n%s" % metadata.get_json())
 
     return post_id
 
